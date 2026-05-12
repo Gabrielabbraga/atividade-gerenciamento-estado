@@ -1,56 +1,101 @@
-import { useNavigate } from "react-router-dom";
-import { useAtendimento } from "../context/AtendimentoContext";
+import { useState } from "react";
+import { useTarefas } from "../context/AtendimentoContext";
 
 function Cadastro() {
-  const { state, dispatch } = useAtendimento();
-  const navigate = useNavigate();
+  const [titulo, setTitulo] = useState("");
+  const { state, dispatch } = useTarefas();
 
-  function handleChange(e) {
-    dispatch({
-      type: "ATUALIZAR",
-      campo: e.target.name,
-      valor: e.target.value
-    });
-  }
+  const tarefasFiltradas = state.tarefas.filter((tarefa) => {
+    if (state.filtro === "pendentes") {
+      return !tarefa.concluida;
+    }
 
-  function handleSubmit(e) {
+    if (state.filtro === "concluidas") {
+      return tarefa.concluida;
+    }
+
+    return true;
+  });
+
+  function adicionarTarefa(e) {
     e.preventDefault();
-    navigate("/resumo");
+
+    dispatch({
+      type: "ADICIONAR_TAREFA",
+      titulo: titulo
+    });
+
+    setTitulo("");
   }
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>Cadastro do Paciente</h2>
+    <section className="card">
+      <h2>Minhas tarefas</h2>
 
-      <form onSubmit={handleSubmit}>
+      <p className="descricao">
+        Adicione, conclua e remova tarefas usando estado global em React.
+      </p>
+
+      <form className="formulario" onSubmit={adicionarTarefa}>
         <input
-          name="nome"
-          placeholder="Nome completo"
-          value={state.nome}
-          onChange={handleChange}
-          required
+          type="text"
+          placeholder="Digite uma nova tarefa"
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
         />
 
-        <input
-          name="contato"
-          placeholder="Contato (telefone ou email)"
-          value={state.contato}
-          onChange={handleChange}
-          required
-        />
-
-        <textarea
-          name="sintoma"
-          placeholder="Descreva o sintoma..."
-          value={state.sintoma}
-          onChange={handleChange}
-          rows="4"
-          required
-        />
-
-        <button type="submit">Avançar</button>
+        <button type="submit">Adicionar</button>
       </form>
-    </div>
+
+      <div className="filtros">
+        <button onClick={() => dispatch({ type: "ALTERAR_FILTRO", filtro: "todas" })}>
+          Todas
+        </button>
+
+        <button onClick={() => dispatch({ type: "ALTERAR_FILTRO", filtro: "pendentes" })}>
+          Pendentes
+        </button>
+
+        <button onClick={() => dispatch({ type: "ALTERAR_FILTRO", filtro: "concluidas" })}>
+          Concluídas
+        </button>
+      </div>
+
+      <ul className="lista">
+        {tarefasFiltradas.length === 0 ? (
+          <li className="vazio">Nenhuma tarefa encontrada.</li>
+        ) : (
+          tarefasFiltradas.map((tarefa) => (
+            <li key={tarefa.id} className={tarefa.concluida ? "concluida" : ""}>
+              <span>{tarefa.titulo}</span>
+
+              <div>
+                <button
+                  className="botao-secundario"
+                  onClick={() => dispatch({ type: "ALTERAR_STATUS", id: tarefa.id })}
+                >
+                  {tarefa.concluida ? "Desfazer" : "Concluir"}
+                </button>
+
+                <button
+                  className="botao-perigo"
+                  onClick={() => dispatch({ type: "REMOVER_TAREFA", id: tarefa.id })}
+                >
+                  Remover
+                </button>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+
+      <button
+        className="limpar"
+        onClick={() => dispatch({ type: "LIMPAR_CONCLUIDAS" })}
+      >
+        Limpar concluídas
+      </button>
+    </section>
   );
 }
 

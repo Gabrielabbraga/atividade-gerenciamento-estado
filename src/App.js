@@ -2,19 +2,19 @@ import { Outlet, Link } from "react-router-dom";
 
 function App() {
   return (
-    <div className="container">
-      <h1>Clínica Sorriso Saudável</h1>
+    <main className="app">
+      <header className="cabecalho">
+        <h1>App de Tarefas</h1>
+        <p>Refatoração de projeto para React com gerenciamento de estado.</p>
 
-      <nav>
-        <Link to="/">Cadastro</Link>
-        <span> | </span>
-        <Link to="/resumo">Resumo</Link>
-      </nav>
-
-      <hr />
+        <nav>
+          <Link to="/">Tarefas</Link>
+          <Link to="/resumo">Resumo</Link>
+        </nav>
+      </header>
 
       <Outlet />
-    </div>
+    </main>
   );
 }
 

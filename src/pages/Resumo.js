@@ -1,26 +1,37 @@
-import { useNavigate } from "react-router-dom";
-import { useAtendimento } from "../context/AtendimentoContext";
+import { useTarefas } from "../context/AtendimentoContext";
 
 function Resumo() {
-  const { state, dispatch } = useAtendimento();
-  const navigate = useNavigate();
+  const { state } = useTarefas();
+
+  const total = state.tarefas.length;
+  const concluidas = state.tarefas.filter((tarefa) => tarefa.concluida).length;
+  const pendentes = total - concluidas;
 
   return (
-    <div>
-      <h2>Resumo</h2>
+    <section className="card">
+      <h2>Resumo das tarefas</h2>
 
-      <p><strong>Nome:</strong> {state.nome}</p>
-      <p><strong>Contato:</strong> {state.contato}</p>
-      <p><strong>Sintoma:</strong> {state.sintoma}</p>
+      <div className="resumo-grid">
+        <div className="resumo-item">
+          <strong>{total}</strong>
+          <span>Total</span>
+        </div>
 
-      <button onClick={() => navigate("/")}>
-        Voltar
-      </button>
+        <div className="resumo-item">
+          <strong>{pendentes}</strong>
+          <span>Pendentes</span>
+        </div>
 
-      <button onClick={() => dispatch({ type: "LIMPAR" })}>
-        Limpar
-      </button>
-    </div>
+        <div className="resumo-item">
+          <strong>{concluidas}</strong>
+          <span>Concluídas</span>
+        </div>
+      </div>
+
+      <p className="descricao">
+        Os dados são compartilhados entre as páginas através do estado global da aplicação.
+      </p>
+    </section>
   );
 }
 
